@@ -194,7 +194,7 @@ void dfs(int u){
 
 **示例 1：**
 
-![示例图片](.\images\1.png)
+![示例图片](./images/1.png)
 
 ~~~shell
 输入：root1 = [1,3,2,5], root2 = [2,1,3,null,4,null,7]
