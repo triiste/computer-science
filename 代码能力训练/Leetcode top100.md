@@ -675,7 +675,7 @@ public:
 
 给你一个 非空 整数数组 nums ，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
 
-你必须设计并实现线性时间复杂度的算法来解决此问题，且该算法只使用常量额外空间。
+你必须设计并实现线性时间复杂度的算法来解决此问题，且该算法只使用常量额外空间。 
 
 **示例 1 ：**
 
@@ -1257,17 +1257,59 @@ lRUCache.get(4);    // 返回 4
 ~~~cpp
 class LRUCache {
 public:
-     
+    struct Node{
+        int key,val;
+        Node *left,*right;
+        Node(int key,int val):key(key),val(val),left(nullptr),right(nullptr){}
+    }*L,*R;
+    //哈希表＋双链表解决问题
+    unordered_map<int,Node *> hash; //一个存key 一个存结构体节点
+    int n;
+    void remove(Node *p){
+        p->right->left=p->left;
+        p->left->right=p->right;
+    }
+    void insert(Node *p){
+        p->right=L->right;
+        p->left=L;
+        L->right->left=p;
+        L->right=p;
+    }
     LRUCache(int capacity) {
-
+        n=capacity;
+        L=new Node(-1,-1);
+        R=new Node(-1,-1);
+        L->right=R;
+        R->left=L;
     }
-    
     int get(int key) {
-
+        //取这个值
+        if(hash.count(key)){
+            auto *p=hash[key];
+            remove(p);
+            insert(p);
+            return p->val;
+        }else{
+            return -1;
+        }
     }
-    
     void put(int key, int value) {
-
+        if(hash.count(key)){
+            auto *p=hash[key]; //取出存的节点
+            remove(p);//删掉这个节点
+            insert(p);//插入到前面
+            p->val=value;//改变这个节点的值
+        }else{
+            if(n==hash.size()){
+                auto *p=R->left;
+                remove(p);
+                hash.erase(p->key);
+                delete p;
+            }
+            auto *p=new Node(key,value);
+            hash[key]=p;
+            insert(p);
+        }
     }
 };
 
@@ -1279,23 +1321,566 @@ public:
  */
 ~~~
 
+## 3.无重复字符的最小字串
 
+给定一个字符串 `s` ，请你找出其中不含有重复字符的 **最长子串** 的长度。
 
+**示例 1:**
 
+```
+输入: s = "abcabcbb"
+输出: 3 
+解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。
+```
 
+**示例 2:**
 
+```
+输入: s = "bbbbb"
+输出: 1
+解释: 因为无重复字符的最长子串是 "b"，所以其长度为 1。
+```
 
+示例 3:
 
+~~~
+输入: s = "pwwkew"
+输出: 3
+解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。
+     请注意，你的答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
+~~~
 
+~~~cpp
+//求字串 共有n^2/2
+//在这么多字符串找到没有重复的
+//以字串的尾节点进行分类 可以分为n类 0~n-1类
+//枚举以i为尾节点的字串找到最靠左的j 使得从j到i不包含重复的且最大长度的串 枚举j是n^2的时间复杂度
+//i往后移动 i'所对应的j'也会相应往后移动
+//及时记录
+//出现重复 把i+1加到集合里面，有重复肯定是s[i+1],j一直往后移动直到移动到i+1为止然后删掉
+~~~
 
+~~~cpp
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        unordered_map<char,int> heap;
+        int res=0;
+        for(int i=0,j=0;i<s.size();i++){
+            heap[s[i]]++;
+            while(heap[s[i]]>1) heap[s[j++]]--;
+            res=max(res,i-j+1);
+        }
+        return res;
+    }
+};
+~~~
 
+## 5.最长回文字串 
 
+给你一个字符串 `s`，找到 `s` 中最长的回文子串。
 
+如果字符串的反序与原始字符串相同，则该字符串称为回文字符串。
 
+**示例 1：**
 
+```
+输入：s = "babad"
+输出："bab"
+解释："aba" 同样是符合题意的答案。
+```
 
+**示例 2：**
 
+```
+输入：s = "cbbd"
+输出："bb"
+```
 
+~~~cpp
+/*
+解决思路:枚举中心点 两个指针从中心往两边走，直到走到边界或者不一致即最长
+L  i  R  [L+1,R-1] 最长的回文串 
+奇数：初始化L=i-1,R=i+1即可
+偶数：初始化L=i,R=i+1;
+字符串下标是从 l开始
+(l+1,r-L-1) //因为一开始就是设定的左右 r-l-1是个数 本应该 r-l+1 但是一开始是不确定当前的r和l是否对称
+O(n^2)
+*/
+~~~
 
+~~~cpp
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        string res;
+        int l,r;
+        for(int i=0;i<s.size();i++){
+            l=i-1;r=i+1;
+            while(l>=0&&r<s.size()&&s[l]==s[r]){l--;r++; }
+            if(res.size()<r-l-1) res=s.substr(l+1,r-l-1);
+            l=i;r=i+1;
+            while(l>=0&&r<s.size()&&s[l]==s[r]){ l--;r++;}
+            if(res.size()<r-l-1) res=s.substr(l+1,r-l-1);
+        }
+        return res;
 
+    }
+};
+~~~
+
+## 11.盛最多水的容器
+
+给定一个长度为 n 的整数数组 height 。有 n 条垂线，第 i 条线的两个端点是 (i, 0) 和 (i, height[i]) 。
+
+找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最多的水。
+
+返回容器可以储存的最大水量。
+
+说明：你不能倾斜容器。
+
+~~~cpp
+class Solution {
+public:
+    int maxArea(vector<int>& height) {
+        //思路：从两边向中间靠拢 哪边低就往中间靠拢
+        int i=0,j=height.size()-1;
+        int res=0;
+        while(i<j){
+            int min=height[i]<height[j]?height[i]:height[j];
+            if(res<min*(j-i))    res=min*(j-i);
+            if(height[i]<height[j]) i++;
+            else j--;
+        }
+        return res;
+
+    }
+};
+~~~
+
+## 15.三数之和
+
+给你一个整数数组 nums ，判断是否存在三元组 [nums[i], nums[j], nums[k]] 满足 i != j、i != k 且 j != k ，同时还满足 nums[i] + nums[j] + nums[k] == 0 。请
+
+你返回所有和为 0 且不重复的三元组。
+
+注意：答案中不可以包含重复的三元组。
+
+示例 1：
+
+~~~
+输入：nums = [-1,0,1,2,-1,-4]
+输出：[[-1,-1,2],[-1,0,1]]
+解释：
+nums[0] + nums[1] + nums[2] = (-1) + 0 + 1 = 0 。
+nums[1] + nums[2] + nums[4] = 0 + 1 + (-1) = 0 。
+nums[0] + nums[3] + nums[4] = (-1) + 2 + (-1) = 0 。
+不同的三元组是 [-1,0,1] 和 [-1,-1,2] 。
+注意，输出的顺序和三元组的顺序并不重要。
+~~~
+
+~~~cpp
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        //双指针算法
+        vector<vector<int>> res;
+        sort(nums.begin(),nums.end());
+        //把i固定 拿j和k进行双指针遍历
+        for(int i=0;i<nums.size();i++){
+            if(i&&nums[i]==nums[i-1]) continue; //i遇到重复不进行操作
+            for(int j=i+1,k=nums.size()-1;j<k;j++) //j~k之间进行移动 j往后移动增大过程
+            {
+                if(j>i+1&&nums[j]==nums[j-1]) continue;
+                //k往前移动 变小过程
+                while(j<k-1&&nums[i]+nums[j]+nums[k-1]>=0) k--;
+                if(nums[i]+nums[j]+nums[k]==0)
+                res.push_back({nums[i],nums[j],nums[k]});
+            }
+        }
+        return res;
+
+    }
+};
+~~~
+
+## 34.在排序数组中查找元素的第一个和最后一个位置
+
+给你一个按照非递减顺序排列的整数数组 nums，和一个目标值 target。请你找出给定目标值在数组中的开始位置和结束位置。
+
+如果数组中不存在目标值 target，返回 [-1, -1]。
+
+你必须设计并实现时间复杂度为 O(log n) 的算法解决此问题。
+
+**示例 1：**
+
+```
+输入：nums = [5,7,7,8,8,10], target = 8
+输出：[3,4]
+```
+
+**示例 2：**
+
+```
+输入：nums = [5,7,7,8,8,10], target = 6
+输出：[-1,-1]
+```
+
+**示例 3：**
+
+```
+输入：nums = [], target = 0
+输出：[-1,-1]
+```
+
+~~~cpp
+class Solution {
+public:
+    vector<int> searchRange(vector<int> &nums, int target) {
+
+        vector<int> res(2);
+        if (nums.size() == 0) {
+            res[0] = -1;
+            res[1] = -1;
+            return res;
+        }
+        int l = 0, r = nums.size() - 1;
+        while (l < r) { //找左端点
+            int mid = (l + r) / 2;
+            if (nums[mid] >= target) r = mid;
+            else l = mid + 1;
+        }
+        if (nums[l] != target) {
+            res[0] = -1;
+            res[1] = -1;
+            return res;
+        } else {
+            res[0] = l;
+            l = 0, r = nums.size() - 1;
+            while (l < r) {
+                int mid = (l + r + 1) / 2;
+                if (nums[mid] <= target) l = mid;
+                else r = mid - 1;
+            }
+            res[1] = l;
+            return res;
+        }
+
+    }
+};
+~~~
+
+##  17.电话号码的字母组合
+
+给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合。答案可以按 任意顺序 返回。
+
+给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。
+
+![示例图片](./images/2.png)
+
+**示例 1：**
+
+```
+输入：digits = "23"
+输出：["ad","ae","af","bd","be","bf","cd","ce","cf"]
+```
+
+**示例 2：**
+
+```
+输入：digits = ""
+输出：[]
+```
+
+**示例 3：**
+
+```
+输入：digits = "2"
+输出：["a","b","c"]
+```
+
+~~~CPP
+class Solution {
+public:
+    vector<string> res;
+    string a[10]={
+        "","","abc","def",
+        "ghi","jkl","mno",
+        "pqrs","tuv","wxyz",
+    };
+    vector<string> letterCombinations(string digits) {
+        if(digits.empty()) return res;
+        dfs(digits,0,"");
+        return res;
+    }
+    void dfs(string digits,int u,string path){
+        if(digits.size()==u) res.push_back(path);//回溯终止符
+        else{
+            for(auto c:a[digits[u]-'0']){
+                dfs(digits,u+1,path+c);
+            }
+        }
+    }
+};
+~~~
+
+## 19.删除链表的第N个结点
+
+给你一个链表，删除链表的倒数第 `n` 个结点，并且返回链表的头结点。
+
+```
+输入：head = [1,2,3,4,5], n = 2
+输出：[1,2,3,5]
+```
+
+~~~cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        if(n==1 &&head->next==nullptr){
+            return nullptr;
+        }
+        ListNode *p=head,*q=head,*pre=p;
+        //p不走，先让q走到n步
+        int rn=n-1;
+        while(rn--){
+            q=q->next;
+        }
+        if(q->next ==nullptr){
+            return head->next;
+        }
+        while(q->next!=nullptr){
+            pre=p;
+            p=p->next;
+            q=q->next;
+        }
+        pre->next=p->next;
+        delete p;
+        return head;
+    }
+};
+~~~
+
+## 45.全排列
+
+给定一个不含重复数字的数组 `nums` ，返回其 *所有可能的全排列* 。你可以 **按任意顺序** 返回答案。
+
+**示例 1：**
+
+```
+输入：nums = [1,2,3]
+输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+```
+
+**示例 2：**
+
+```
+输入：nums = [0,1]
+输出：[[0,1],[1,0]]
+```
+
+**示例 3：**
+
+```
+输入：nums = [1]
+输出：[[1]]
+```
+
+~~~cpp
+class Solution {
+public:
+    bool st[6];
+    vector<int> path;
+    vector<vector<int>> res;
+    void dfs(vector<int>&nums,int u){
+        if(nums.size()==u) res.push_back({path});
+        for(int i=0;i<nums.size();i++){
+            if(!st[i]){
+                //访问
+                path.push_back(nums[i]);
+                st[i]=true;
+                dfs(nums,u+1);
+                st[i]=false;
+                path.pop_back();
+
+            }
+        }
+    }
+    vector<vector<int>> permute(vector<int>& nums) {
+        dfs(nums,0);
+        return res;
+    }
+};
+~~~
+
+## 78.子集
+
+给你一个整数数组 `nums` ，数组中的元素 **互不相同** 。返回该数组所有可能的子集（幂集）。
+
+解集 **不能** 包含重复的子集。你可以按 **任意顺序** 返回解集。
+
+**示例 1：**
+
+```
+输入：nums = [1,2,3]
+输出：[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+```
+
+**示例 2：**
+
+```
+输入：nums = [0]
+输出：[[],[0]]
+```
+
+~~~cpp
+/*
+用二进制数表示选或者不选
+n个数
+从 0 枚举到 2^n -1 即可
+*/
+~~~
+
+~~~cpp
+class Solution {
+public:
+
+    vector<vector <int>> res;
+    vector<vector<int>> subsets(vector<int>& nums) {
+        int n=nums.size();
+        for(int i=0;i<1<<n;i++){
+                 vector<int> path;
+            for(int j=0;j<n;j++){
+                if(i>>j&1)
+                    path.push_back(nums[j]);//这种状态就放,转换成代码即可
+            }
+            res.push_back(path);
+        }
+        return res; 
+    }
+};
+~~~
+
+## 347.前k个高频元素
+
+给你一个整数数组 `nums` 和一个整数 `k` ，请你返回其中出现频率前 `k` 高的元素。你可以按 **任意顺序** 返回答案。
+
+ **示例 1:**
+
+```
+输入: nums = [1,1,1,2,2,3], k = 2
+输出: [1,2]
+```
+
+**示例 2:**
+
+```
+输入: nums = [1], k = 1
+输出: [1]
+```
+
+~~~cpp
+class Solution {
+public:
+    vector<int> res;
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+            unordered_map<int,int> cnt;
+//        输入: nums = [1,1,1,2,2,3], k = 2
+//        输出: [1,2]
+        for(auto x:nums) cnt[x]++;
+        //1 3
+        //2 2
+        //3 1
+        //key 存的是数据 value存的是数量
+        int n=nums.size();
+        vector<int> s(n+1,0);
+        for(auto [x,c]:cnt) s[c]++; //s数组记录有几个数量一样的  s[3]=1  s[2] =1  s[1] =1
+        int i=n,t=0;//n=6
+        while(t<k) t+=s[i--];//找到k个数截至
+        //输出即可
+        for(auto [x,c]:cnt){
+            if(c>i){
+                res.push_back(x);
+            }
+        }
+        return res;
+    }
+};
+~~~
+
+## 128.最长连续序列 
+
+给定一个未排序的整数数组 nums ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。
+
+请你设计并实现时间复杂度为 O(n) 的算法解决此问题。
+
+**示例 1：**
+
+```
+输入：nums = [100,4,200,1,3,2]
+输出：4
+解释：最长数字连续序列是 [1, 2, 3, 4]。它的长度为 4。
+```
+
+~~~cpp
+class Solution {
+public:
+    int longestConsecutive(vector<int>& nums) {
+        int maxlen=1,ans=1;
+        if(!nums.size()) return 0;
+        sort(nums.begin(),nums.end());
+        for(int i=1;i<nums.size();i++){
+            if(nums[i-1]==nums[i]) continue;
+            if(nums[i]==nums[i-1]+1) {maxlen++; ans=max(maxlen,ans);}
+            else maxlen=1;
+        }
+        return ans;
+    }
+};
+~~~
+
+## 215.数组中的第K个最大元素
+
+给定整数数组 nums 和整数 k，请返回数组中第 k 个最大的元素。
+
+请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。
+
+你必须设计并实现时间复杂度为 O(n) 的算法解决此问题。
+
+**示例 1:**
+
+```
+输入: [3,2,1,5,6,4], k = 2
+输出: 5
+```
+
+~~~cpp
+class Solution {
+public:
+    int quick_sort(vector<int>& q,int l,int r,int k){
+        if(l==r) return q[l];
+        int i=l-1,j=r+1,x=q[(l+r)/2];
+        while(i<j){
+            do i++;while(q[i]>x);
+            do j--;while(q[j]<x);
+            if(i<j) swap(q[i],q[j]);
+        }
+        if(k<=j-l+1) return quick_sort(q,l,j,k);
+        else return quick_sort(q,j+1,r,k-(j-l+1));
+    }
+    int findKthLargest(vector<int>& nums, int k) {
+        return  quick_sort(nums,0,nums.size()-1,k);
+    }
+};
+~~~
 
