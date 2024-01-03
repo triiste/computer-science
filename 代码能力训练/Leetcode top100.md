@@ -955,3 +955,525 @@ public:
 };
 ~~~
 
+## 矩阵
+
+### 73.矩阵置零
+
+给定一个 `m x n` 的矩阵，如果一个元素为 **0** ，则将其所在行和列的所有元素都设为 **0** 。请使用 **[原地](http://baike.baidu.com/item/原地算法)** 算法**。**
+
+**示例 1：**
+
+<img src="https://assets.leetcode.com/uploads/2020/08/17/mat1.jpg" alt="img" style="zoom:80%;" />
+
+```
+输入：matrix = [[1,1,1],[1,0,1],[1,1,1]]
+输出：[[1,0,1],[0,0,0],[1,0,1]]
+```
+
+**示例 2：**
+
+<img src="https://assets.leetcode.com/uploads/2020/08/17/mat2.jpg" alt="img" style="zoom:80%;" />
+
+```
+输入：matrix = [[0,1,2,0],[3,4,5,2],[1,3,1,5]]
+输出：[[0,0,0,0],[0,4,5,0],[0,3,1,0]]
+```
+
+~~~cpp
+/*
+思路：采用两个标记数组
+*/
+~~~
+
+~~~cpp
+class Solution {
+public:
+    void setZeroes(vector<vector<int>>& matrix) {
+        int m=matrix.size();
+        int n=matrix[0].size();
+        vector<int> row(m,1),col(n,1);
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(matrix[i][j]== 0){
+                    row[i]=0;                    
+                    col[j]=0;
+                }
+            }
+        }
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n;j++){
+                if(!row[i] || !col[j]){
+                    matrix[i][j]=0;
+                }
+            }
+        }
+
+    }
+};
+~~~
+
+### 54.螺旋矩阵
+
+给你一个 `m` 行 `n` 列的矩阵 `matrix` ，请按照 **顺时针螺旋顺序** ，返回矩阵中的所有元素。
+
+**示例 1：**
+
+![img](https://assets.leetcode.com/uploads/2020/11/13/spiral1.jpg)
+
+```
+输入：matrix = [[1,2,3],[4,5,6],[7,8,9]]
+输出：[1,2,3,6,9,8,7,4,5]
+```
+
+**示例 2：**
+
+![img](https://assets.leetcode.com/uploads/2020/11/13/spiral.jpg)
+
+```
+输入：matrix = [[1,2,3,4],[5,6,7,8],[9,10,11,12]]
+输出：[1,2,3,4,8,12,11,10,9,5,6,7]
+```
+
+~~~cpp
+/*
+思路 从右下左上的顺序轮转，用4个变量记录边界
+*/
+~~~
+
+~~~cpp
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        //从右下左上四个方向遍历
+        int l=0,r=matrix[0].size()-1;
+        int u=0,d=matrix.size()-1;
+        vector<int> res;
+        while(true){
+            for(int j=l;j<=r;j++){ //从左到右
+                res.push_back(matrix[u][j]);
+            }
+            if(++u > d) break;
+            for(int i=u;i<=d;i++){ //从上到下
+                res.push_back(matrix[i][r]);              
+            }
+            if(--r <l) break;
+            for(int i=r;i>=l;i--) //从右到左
+            {
+                res.push_back(matrix[d][i]);
+            }
+            if(--d < u) break;
+            for(int i=d;i>=u;i--) //从下到上
+            {
+                res.push_back(matrix[i][l]);
+            }
+            if(++l > r) break;
+        }
+        return res;
+    }
+};
+~~~
+
+### 48.旋转图像
+
+给定一个 *n* × *n* 的二维矩阵 `matrix` 表示一个图像。请你将图像顺时针旋转 90 度。
+
+你必须在**[ 原地](https://baike.baidu.com/item/原地算法)** 旋转图像，这意味着你需要直接修改输入的二维矩阵。**请不要** 使用另一个矩阵来旋转图像。
+
+**示例 1：**
+
+![img](https://assets.leetcode.com/uploads/2020/08/28/mat1.jpg)
+
+```
+输入：matrix = [[1,2,3],[4,5,6],[7,8,9]]
+输出：[[7,4,1],[8,5,2],[9,6,3]]
+```
+
+**示例 2：**
+
+![img](https://assets.leetcode.com/uploads/2020/08/28/mat2.jpg)
+
+```
+输入：matrix = [[5,1,9,11],[2,4,8,10],[13,3,6,7],[15,14,12,16]]
+输出：[[15,13,2,5],[14,3,4,1],[12,6,8,9],[16,7,10,11]]
+```
+
+~~~cpp
+/**
+思路：先水平旋转 后对角线旋转
+**/
+~~~
+
+~~~cpp
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        int n=matrix.size();
+        //先翻转
+        for(int i=0;i<n/2;i++){
+            for(int j=0;j<n;j++){
+                swap(matrix[i][j],matrix[n-i-1][j]);
+            }
+        }
+        //后主对角线交换
+        for(int i=0;i<n;i++)
+            for(int j=i+1;j<n;j++)
+            swap(matrix[i][j],matrix[j][i]);
+        
+            
+    }
+};
+~~~
+
+### 240.搜索二维矩阵Ⅱ
+
+编写一个高效的算法来搜索 `*m* x *n*` 矩阵 `matrix` 中的一个目标值 `target` 。该矩阵具有以下特性：
+
+- 每行的元素从左到右升序排列。
+- 每列的元素从上到下升序排列。
+
+**示例 1：**
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/11/25/searchgrid2.jpg)
+
+```
+输入：matrix = [[1,4,7,11,15],[2,5,8,12,19],[3,6,9,16,22],[10,13,14,17,24],[18,21,23,26,30]], target = 5
+输出：true
+```
+
+**示例 2：**
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/11/25/searchgrid.jpg)
+
+```
+输入：matrix = [[1,4,7,11,15],[2,5,8,12,19],[3,6,9,16,22],[10,13,14,17,24],[18,21,23,26,30]], target = 20
+输出：false
+```
+
+~~~cpp
+//思路：
+/*
+从第一行最后一个开始，target小就往左，target大就往下
+*/
+
+~~~
+
+
+
+~~~cpp
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        int m=matrix.size();
+        int n=matrix[0].size();
+        int x=0,y=n-1,num;
+        while(x<m && y>=0){
+            num=matrix[x][y];
+            if(num>target) y--;
+            else if(num == target) return true;
+            else if(num < target) x++;
+        }
+        return false;
+    }
+};
+~~~
+
+## 链表
+
+### 160.相交链表
+
+给你两个单链表的头节点 `headA` 和 `headB` ，请你找出并返回两个单链表相交的起始节点。如果两个链表不存在相交节点，返回 `null` 。
+
+图示两个链表在节点 `c1` 开始相交**：**
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_statement.png)
+
+题目数据 **保证** 整个链式结构中不存在环。
+
+**注意**，函数返回结果后，链表必须 **保持其原始结构** 。
+
+**自定义评测：**
+
+**评测系统** 的输入如下（你设计的程序 **不适用** 此输入）：
+
+- `intersectVal` - 相交的起始节点的值。如果不存在相交节点，这一值为 `0`
+- `listA` - 第一个链表
+- `listB` - 第二个链表
+- `skipA` - 在 `listA` 中（从头节点开始）跳到交叉节点的节点数
+- `skipB` - 在 `listB` 中（从头节点开始）跳到交叉节点的节点数
+
+评测系统将根据这些输入创建链式数据结构，并将两个头节点 `headA` 和 `headB` 传递给你的程序。如果程序能够正确返回相交节点，那么你的解决方案将被 **视作正确答案** 
+
+~~~cpp
+/*
+思路:a走到头 走b b走到头 走a 不相交最后都会为空
+*/
+~~~
+
+~~~cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode *getIntersectionNode(ListNode *headA, ListNode *headB) {
+        ListNode *p=headA,*q=headB;
+        while(p!=q){  
+            if(!p) p=headB;   
+            if(!q) q=headA;    
+            if(p==q) return p;                           
+            p=p->next;
+            q=q->next;           
+        }
+        return p;        
+    }
+};
+~~~
+
+### 206.反转链表
+
+给你单链表的头节点 `head` ，请你反转链表，并返回反转后的链表。
+
+**示例 1：**
+
+![img](https://assets.leetcode.com/uploads/2021/02/19/rev1ex1.jpg)
+
+```
+输入：head = [1,2,3,4,5]
+输出：[5,4,3,2,1]
+```
+
+**示例 2：**
+
+![img](https://assets.leetcode.com/uploads/2021/02/19/rev1ex2.jpg)
+
+```
+输入：head = [1,2]
+输出：[2,1]
+```
+
+**示例 3：**
+
+```
+输入：head = []
+输出：[]
+```
+
+~~~cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* reverseList(ListNode* head) {
+        ListNode *p=head,*q,*h=new ListNode(-1);
+        while(p){
+            q=p->next;
+            p->next=h->next;
+            h->next=p;
+            p=q;
+        }
+        return h->next;
+    }
+};
+~~~
+
+### 234.回文链表
+
+给你一个单链表的头节点 `head` ，请你判断该链表是否为回文链表。如果是，返回 `true` ；否则，返回 `false` 。
+
+**示例 1：**
+
+![img](https://assets.leetcode.com/uploads/2021/03/03/pal1linked-list.jpg)
+
+```
+输入：head = [1,2,2,1]
+输出：true
+```
+
+**示例 2：**
+
+![img](https://assets.leetcode.com/uploads/2021/03/03/pal2linked-list.jpg)
+
+```
+输入：head = [1,2]
+输出：false
+```
+
+~~~cpp
+/*
+思路 用栈 从前往后和从后往前遍历一样说明是回文串
+*/
+~~~
+
+~~~cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    bool isPalindrome(ListNode* head) {
+        //回文链表进栈即可
+        stack<ListNode*> st;
+        ListNode* current = head;
+        while (current != nullptr) {
+            st.push(current);
+            current = current->next;
+        }
+        ListNode* c = head;
+        while(c != nullptr){            
+            auto node = st.top();
+            st.pop();
+            if(c->val != node->val) return false;
+            c=c->next;
+         }
+         return true;
+
+    }
+};
+~~~
+
+### 141.环形链表
+
+给你一个链表的头节点 `head` ，判断链表中是否有环。
+
+如果链表中有某个节点，可以通过连续跟踪 `next` 指针再次到达，则链表中存在环。 为了表示给定链表中的环，评测系统内部使用整数 `pos` 来表示链表尾连接到链表中的位置（索引从 0 开始）。**注意：`pos` 不作为参数进行传递** 。仅仅是为了标识链表的实际情况。
+
+*如果链表中存在环* ，则返回 `true` 。 否则，返回 `false` 。
+
+**示例 1：**
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist.png)
+
+```
+输入：head = [3,2,0,-4], pos = 1
+输出：true
+解释：链表中有一个环，其尾部连接到第二个节点。
+```
+
+**示例 2：**
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist_test2.png)
+
+```
+输入：head = [1,2], pos = 0
+输出：true
+解释：链表中有一个环，其尾部连接到第一个节点。
+```
+
+**示例 3：**
+
+```
+输入：head = [1], pos = -1
+输出：false
+解释：链表中没有环。
+```
+
+~~~cpp
+/*
+思路 采用快慢指针解决
+*/
+~~~
+
+~~~cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    bool hasCycle(ListNode *head) {
+        if(!head) return false;
+        auto *p=head,*q=head;
+        do{
+            if(p) p=p->next;
+            if(q) q=q->next;
+            if(q) q=q->next;
+        }while(p!=q);
+        if(q) return true;
+        else return false;
+        
+    }
+};
+~~~
+
+### 142.环形链表
+
+给定一个链表的头节点  `head` ，返回链表开始入环的第一个节点。 *如果链表无环，则返回 `null`。*
+
+如果链表中有某个节点，可以通过连续跟踪 `next` 指针再次到达，则链表中存在环。 为了表示给定链表中的环，评测系统内部使用整数 `pos` 来表示链表尾连接到链表中的位置（**索引从 0 开始**）。如果 `pos` 是 `-1`，则在该链表中没有环。**注意：`pos` 不作为参数进行传递**，仅仅是为了标识链表的实际情况。
+
+**不允许修改** 链表。
+
+~~~cpp
+/**
+思路：先使用快慢指针使得两者相遇判断出有环，
+相遇点之后 时光倒流 慢指针退到交点 快指针退到-y点，也就是说 从交点走x步会走到c‘，那么从相遇点走x步会走到交点，x步恰好是从起点开始走的
+**/
+~~~
+
+~~~cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode *detectCycle(ListNode *head) {
+        if(!head) return NULL;
+        auto *p=head,*q=head;
+        do{
+            if(p) p=p->next;
+            if(q) q=q->next;
+            if(q) q=q->next;
+        }while(p!=q);
+        if(!p) return NULL;
+        p=head;
+        while(p!=q){
+            p=p->next;
+            q=q->next;
+        }
+        return q;
+    }
+};
+~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+~
