@@ -1419,7 +1419,7 @@ public:
 };
 ~~~
 
-### 142.环形链表
+### 142.环形链表Ⅱ
 
 给定一个链表的头节点  `head` ，返回链表开始入环的第一个节点。 *如果链表无环，则返回 `null`。*
 
@@ -1464,16 +1464,389 @@ public:
 };
 ~~~
 
+### 21.合并两个有序链表
 
+将两个升序链表合并为一个新的 **升序** 链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。 
 
+**示例 1：**
 
+![img](https://assets.leetcode.com/uploads/2020/10/03/merge_ex1.jpg)
 
+```
+输入：l1 = [1,2,4], l2 = [1,3,4]
+输出：[1,1,2,3,4,4]
+```
 
+**示例 2：**
 
+```
+输入：l1 = [], l2 = []
+输出：[]
+```
 
+**示例 3：**
 
+```
+输入：l1 = [], l2 = [0]
+输出：[0]
+```
 
+~~~cpp
+/**
+思路 一个一个进行比较 最后收尾
+**/
+~~~
 
+~~~cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+        auto *p=list1,*q=list2;
+        auto *h=new ListNode(0),*r=h;
+        while(p&&q){
+            if(p->val < q->val) {r->next=p;p=p->next;r=r->next;}
+            else {r->next=q;q=q->next;r=r->next;}
+        }
+        //尾部自带为空 无需收尾
+        if(q) {r->next =q;}
+        if(p) {r->next =p;}
+        return h->next;
+        
+    }
+};
+~~~
 
+### 2.两数相加
 
-~
+给你两个 **非空** 的链表，表示两个非负的整数。它们每位数字都是按照 **逆序** 的方式存储的，并且每个节点只能存储 **一位** 数字。
+
+请你将两个数相加，并以相同形式返回一个表示和的链表。
+
+你可以假设除了数字 0 之外，这两个数都不会以 0 开头。
+
+**示例 1：**
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2021/01/02/addtwonumber1.jpg)
+
+```
+输入：l1 = [2,4,3], l2 = [5,6,4]
+输出：[7,0,8]
+解释：342 + 465 = 807.
+```
+
+**示例 2：**
+
+```
+输入：l1 = [0], l2 = [0]
+输出：[0]
+```
+
+**示例 3：**
+
+```
+输入：l1 = [9,9,9,9,9,9,9], l2 = [9,9,9,9]
+输出：[8,9,9,9,0,0,0,1]
+```
+
+~~~cpp
+/**
+思路：逐个相加即可，直到为空,不断往右进位
+**/
+~~~
+
+~~~cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        auto *p=l1,*q=l2,*h=new ListNode(),*r=h;
+        int jinwei=0,gewei,x,y,sum;        
+        while(p||q){
+            if(p) {x=p->val;p=p->next;} else x=0;
+            if(q) {y=q->val;q=q->next;} else y=0;
+            gewei = (jinwei+x+y)%10;//用的是上一轮的进位
+            jinwei =(jinwei+x+y)/10;
+            auto n = new ListNode(gewei);
+            r->next = n;r=r->next;
+        }
+        if(jinwei) 
+        {
+            auto n = new ListNode(jinwei);
+            r->next=n;r=r->next;
+        }
+        r->next=nullptr;
+        return h->next;
+    }
+};
+~~~
+
+### 19.删除链表的倒数第K个结点
+
+给你一个链表，删除链表的倒数第 `n` 个结点，并且返回链表的头结点。
+
+**示例 1：**
+
+![img](https://assets.leetcode.com/uploads/2020/10/03/remove_ex1.jpg)
+
+```
+输入：head = [1,2,3,4,5], n = 2
+输出：[1,2,3,5]
+```
+
+**示例 2：**
+
+```
+输入：head = [1], n = 1
+输出：[]
+```
+
+**示例 3：**
+
+```
+输入：head = [1,2], n = 1
+输出：[1]
+```
+
+~~~cpp
+/*
+采用倒数第K个元素办法 一个先不走 一个走K步 找到后 拿到前驱删除即可
+*/
+~~~
+
+~~~cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        if(!head->next && n == 1) return nullptr;
+        auto *p=head,*q=head,*pre=new ListNode(-999);
+        int count=0;
+        while(p){
+            if(count>=n) {
+                pre = q;
+                q=q->next;
+            }
+            p=p->next;count++;
+        }
+        if(pre->val == -999)  head =q->next;            
+        else pre->next =q->next;
+        delete q;
+        return head;
+    }
+};
+~~~
+
+### 24.两两交换链表中的节点 
+
+给你一个链表，两两交换其中相邻的节点，并返回交换后链表的头节点。你必须在不修改节点内部的值的情况下完成本题（即，只能进行节点交换）。
+
+**示例 1：**
+
+![img](https://assets.leetcode.com/uploads/2020/10/03/swap_ex1.jpg)
+
+```
+输入：head = [1,2,3,4]
+输出：[2,1,4,3]
+```
+
+**示例 2：**
+
+```
+输入：head = []
+输出：[]
+```
+
+**示例 3：**
+
+```
+输入：head = [1]
+输出：[1]
+```
+
+~~~cpp
+//两两进行交换，直到剩下最后一个为止，如果为奇数个则不交换最后一个
+~~~
+
+~~~cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* swapPairs(ListNode* head) {
+        if(!head || !head->next) return head;
+        auto *p = head;
+        ListNode *q,*tmp,*h=new ListNode(0);
+        ListNode *pre = h;
+        head = head->next;
+        pre->next = p;
+        while(p){
+            if(p->next) 
+            {  q=p->next; tmp=q->next;
+                //下面是交换
+                q->next = p;
+                p->next =tmp;
+                pre->next = q;                
+            }
+            pre = p;
+            p=p->next;            
+        }
+        return head;       
+    }
+};
+~~~
+
+### 25.K个一组翻转链表
+
+给你链表的头节点 `head` ，每 `k` 个节点一组进行翻转，请你返回修改后的链表。
+
+`k` 是一个正整数，它的值小于或等于链表的长度。如果节点总数不是 `k` 的整数倍，那么请将最后剩余的节点保持原有顺序。
+
+你不能只是单纯的改变节点内部的值，而是需要实际进行节点交换。
+
+**示例 1：**
+
+![img](https://assets.leetcode.com/uploads/2020/10/03/reverse_ex1.jpg)
+
+```
+输入：head = [1,2,3,4,5], k = 2
+输出：[2,1,4,3,5]
+```
+
+**示例 2：**
+
+![img](https://assets.leetcode.com/uploads/2020/10/03/reverse_ex2.jpg)
+
+```
+输入：head = [1,2,3,4,5], k = 3
+输出：[3,2,1,4,5]
+```
+
+~~~cpp
+/**
+思路 将节点进栈进行操作，然后取出栈内元素即为倒序
+**/
+~~~
+
+~~~cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        if(!head) return nullptr;
+        stack<ListNode*> st;
+        ListNode *h=new ListNode(0);
+        ListNode *r = h,*p=head;
+        int sum=0;
+        while(p) { p=p->next;sum++;}
+        int n=sum/k,count = 0,js=0;        
+        while(head){
+            st.push(head);
+            head = head ->next;
+            count++;
+            if(count == k){
+                while(!st.empty()){
+                    auto c= st.top();
+                    st.pop();
+                    r->next = c;
+                    r=c;
+                }
+                count = 0;
+                js++;
+            }
+            if(js == n) break;     
+        }
+        if(js == n) r->next = head;
+        
+        return  h->next;
+    }
+};
+~~~
+
+### 138.随机链表的复制
+
+给你一个长度为 `n` 的链表，每个节点包含一个额外增加的随机指针 `random` ，该指针可以指向链表中的任何节点或空节点。
+
+构造这个链表的 **[深拷贝](https://baike.baidu.com/item/深拷贝/22785317?fr=aladdin)**。 深拷贝应该正好由 `n` 个 **全新** 节点组成，其中每个新节点的值都设为其对应的原节点的值。新节点的 `next` 指针和 `random` 指针也都应指向复制链表中的新节点，并使原链表和复制链表中的这些指针能够表示相同的链表状态。**复制链表中的指针都不应指向原链表中的节点** 。
+
+例如，如果原链表中有 `X` 和 `Y` 两个节点，其中 `X.random --> Y` 。那么在复制链表中对应的两个节点 `x` 和 `y` ，同样有 `x.random --> y` 。
+
+返回复制链表的头节点。
+
+用一个由 `n` 个节点组成的链表来表示输入/输出中的链表。每个节点用一个 `[val, random_index]` 表示：
+
+- `val`：一个表示 `Node.val` 的整数。
+- `random_index`：随机指针指向的节点索引（范围从 `0` 到 `n-1`）；如果不指向任何节点，则为 `null` 。
+
+你的代码 **只** 接受原链表的头节点 `head` 作为传入参数。
+
+**示例 1：**
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/01/09/e1.png)
+
+```
+输入：head = [[7,null],[13,0],[11,4],[10,2],[1,0]]
+输出：[[7,null],[13,0],[11,4],[10,2],[1,0]]
+```
+
+**示例 2：**
+
+![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/01/09/e2.png)
+
+```
+输入：head = [[1,1],[2,1]]
+输出：[[1,1],[2,1]]
+```
+
+**示例 3：**
+
+**![img](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2020/01/09/e3.png)**
+
+```
+输入：head = [[3,null],[3,0],[3,null]]
+输出：[[3,null],[3,0],[3,null]]
+```
