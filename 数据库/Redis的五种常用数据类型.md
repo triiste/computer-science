@@ -91,3 +91,59 @@ Redis的通用命令是不分数据类型的，都可以使用的命令
 - type key
 - del key
 
+## springboot 中使用Redis
+
+RedisConfig.java配置
+
+~~~java
+    @Bean
+    public ZSetOperations<String, Object> zSetOperations(RedisTemplate<String, Object> redisTemplate) {
+        return redisTemplate.opsForZSet();
+    }
+    // 为 Set 数据结构类型注入操作集合
+    @Bean
+    public SetOperations<String, Object> setOperations(RedisTemplate<String, Object> redisTemplate) {
+        return redisTemplate.opsForSet();
+    }
+~~~
+
+Autowired注入
+
+~~~java
+    @Autowired
+    private ZSetOperations zSetOperations;
+    @Autowired
+    private SetOperations setOperations;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+~~~
+
+ZSetOperations使用
+
+~~~java
+zSetOperations.remove(BLOG_KEY,id);//移除
+Double score = zSetOperations.score(BLOG_KEY, blog.getId());//获取分数
+Long size = zSetOperations.size(BLOG_KEY); //获取长度
+zset = zSetOperations.reverseRange(BLOG_KEY, 0, TopN - 1);//获取根据分数排行
+zSetOperations.incrementScore(BLOG_KEY, blogId, 1);//分数加1
+~~~
+
+SetOperations使用
+
+~~~java
+Set<String> set = setOperations.members(KEY);//获取数量
+setOperations.isMember(KEY,value) //判断是否存在
+setOperations.remove(type,x);//移除某个值
+setOperations.add(COLLECT_KEY,value); //增加某个值
+~~~
+
+stringRedisTemplate 使用
+
+~~~java
+stringRedisTemplate.opsForValue().set(id,"在线");//添加
+RedisTemplate.delete(userMap.get(session.getId()));//删除
+String value = stringRedisTemplate.opsForValue().get(key);//获取 判断是否能获取到
+~~~
+
+
+

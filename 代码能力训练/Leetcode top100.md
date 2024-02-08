@@ -41,19 +41,20 @@
 */
 ~~~
 
-~~~cpp
+~~~java
 class Solution {
-public:
-    vector<int> twoSum(vector<int>& nums, int target) {
-        unordered_map<int,int> hash;
-        for(int i=0;i<nums.size();i++){
-            if(hash.count(target-nums[i])){
-                return {hash[target-nums[i]],i};
-            }else  hash[nums[i]] = i;
+    public int[] twoSum(int[] nums, int target) {
+        HashMap<Integer,Integer> hash = new HashMap<>();
+        for(int i=0;i<nums.length;i++){
+            if(hash.containsKey(target - nums[i])){
+                return new int[]{hash.get(target-nums[i]),i};
+            }else{
+                hash.put(nums[i],i);
+            }
         }
-        return {-1,-1};
+        return new int[]{-1,-1};
     }
-};
+}
 ~~~
 
 ### 49.字母异位词分词
