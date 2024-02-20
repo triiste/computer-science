@@ -46,11 +46,11 @@ class Solution {
     public int[] twoSum(int[] nums, int target) {
         HashMap<Integer,Integer> hash = new HashMap<>();
         for(int i=0;i<nums.length;i++){
-            if(hash.containsKey(target - nums[i])){
+            if(hash.containsKey(target-nums[i])) {
                 return new int[]{hash.get(target-nums[i]),i};
             }else{
                 hash.put(nums[i],i);
-            }
+            }        
         }
         return new int[]{-1,-1};
     }
@@ -93,22 +93,17 @@ class Solution {
 
 ~~~cpp
 class Solution {
-public:
-    vector<vector<string>> groupAnagrams(vector<string>& strs) {
-        unordered_map<string,vector<string>> hash;
-        string str;
-        for(int i=0;i<strs.size();i++){
-            str=strs[i];
-            sort(str.begin(),str.end());
-            hash[str].push_back(strs[i]);
+    public List<List<String>> groupAnagrams(String[] strs) {
+        HashMap<String,List<String>> hash = new HashMap<>();
+        for(int i=0;i<strs.length;i++){
+            char[] ca = strs[i].toCharArray();
+            Arrays.sort(ca);
+            String sorted = new String(ca);
+            hash.computeIfAbsent(sorted,k->new ArrayList<>()).add(strs[i]);
         }
-        vector<vector<string>> res;
-        for(auto [x,c]:hash){
-            res.push_back(c);
-        }
-        return res;
+        return new ArrayList<>(hash.values());
     }
-};
+}
 ~~~
 
 ### 128.最长连续序列
