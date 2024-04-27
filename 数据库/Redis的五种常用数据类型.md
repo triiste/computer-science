@@ -24,8 +24,6 @@ Redis存储的是key-value结构的数据，其中key是字符串类型，value�
 
 集合中每个元素关联一个分数(score)，根据分数升序排序，没有重复元素(可作投票排行榜)   （每个博客 可以采用 blog_id,readCount）
 
-  
-
 # Redis 常用命令
 
 ## 字符串常用命令

@@ -1846,3 +1846,517 @@ public:
 输入：head = [[3,null],[3,0],[3,null]]
 输出：[[3,null],[3,0],[3,null]]
 ```
+
+~~~java
+/*
+// Definition for a Node.
+class Node {
+    int val;
+    Node next;
+    Node random;
+
+    public Node(int val) {
+        this.val = val;
+        this.next = null;
+        this.random = null;
+    }
+}
+*/
+class Solution {
+    HashMap<Node,Node> kv = new HashMap<Node,Node>();
+    public Node copyRandomList(Node head) {
+        if(head == null) return null;
+        if(!kv.containsKey(head)){
+            Node nodeNew = new Node(head.val); //开始的head
+            kv.put(head,nodeNew);
+            nodeNew.next = copyRandomList(head.next);
+            nodeNew.random = copyRandomList(head.random);
+        }
+        return kv.get(head);
+    }
+}
+~~~
+
+### 148.排序链表
+
+给你链表的头结点 `head` ，请将其按 **升序** 排列并返回 **排序后的链表** 。
+
+**示例 1：**
+
+![image-20240306222602706](C:\Users\wcf\AppData\Roaming\Typora\typora-user-images\image-20240306222602706.png)
+
+~~~java
+输入：head = [-1,5,3,4,0]
+输出：[-1,0,3,4,5]
+~~~
+
+**示例 2：**
+
+![image-20240306222659307](C:\Users\wcf\AppData\Roaming\Typora\typora-user-images\image-20240306222659307.png)
+
+~~~java
+输入：head = [-1,5,3,4,0]
+输出：[-1,0,3,4,5]
+~~~
+
+~~~java
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+class Solution {
+    public ListNode sortList(ListNode head) {
+        if(head  == null){
+            return null;
+        }
+        int length = 0;
+        ListNode node = head;
+        while(node != null){ //算出所有长度
+            length++;
+            node = node.next;
+        }
+        ListNode dummyHead = new ListNode(0,head);
+        //左边移动是乘2
+        for(int subLength = 1; subLength < length;  subLength <<= 1){
+            ListNode prev = dummyHead,curr = dummyHead.next;
+            //刚好移动到一半
+            //每次两两合并 长度为1的时候就遍历到头 
+            //长度为2的继续遍历到头
+            while(curr != null){  //两个加起来
+
+            ListNode head1 = curr;//一个子链表
+            for(int i=1;i<subLength && curr.next != null;i++){
+                curr =curr.next;                
+            }
+            ListNode head2=curr.next;//一个子链表
+            curr.next  = null;//置为空
+            curr = head2;
+            for(int i=1;i<subLength && curr != null && curr.next != null;i++){
+                curr = curr.next;
+            }
+            ListNode next = null; //记录了curr的下一串元素
+            if(curr != null){
+                next =curr.next;
+                curr.next = null;
+            }
+            ListNode mereged = merge(head1,head2);
+            prev.next = mereged;
+            while(prev.next !=null){
+                prev = prev.next;
+            }
+            curr = next;
+            }
+           
+        }
+        return dummyHead.next;
+    }
+
+    public ListNode merge(ListNode head1,ListNode head2) {
+        ListNode dummyHead = new ListNode(0);
+        ListNode temp = dummyHead,temp1 = head1,temp2 = head2;
+        while(temp1 != null && temp2 !=null){
+            if(temp1.val <= temp2.val){
+                temp.next = temp1;
+                temp1 = temp1.next;
+            }else{
+                temp.next = temp2;
+                temp2 =temp2.next;
+            }
+            temp =temp.next;
+        }    
+        if(temp1 != null){ //收尾工作
+            temp.next = temp1;
+        }else if(temp2 != null){
+            temp.next = temp2;
+        }
+        return dummyHead.next;
+    }
+}
+~~~
+
+### 23.合并K个升序链表
+
+给你一个链表数组，每个链表都已经按升序排列。请你将所有链表合并到一个升序链表中，返回合并后的链表。
+
+ **示例 1：**
+
+```
+输入：lists = [[1,4,5],[1,3,4],[2,6]]
+输出：[1,1,2,3,4,4,5,6]
+解释：链表数组如下：
+[
+  1->4->5,
+  1->3->4,
+  2->6
+]
+将它们合并到一个有序链表中得到。
+1->1->2->3->4->4->5->6
+```
+
+~~~java
+// 采用优先队列
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * }
+ */
+public class Solution {
+    static class Cmp implements java.util.Comparator<ListNode> {
+        @Override
+        public int compare(ListNode a, ListNode b) {
+            return Integer.compare(a.val, b.val);
+        }
+    }
+
+    public ListNode mergeKLists(ListNode[] lists) {
+        ListNode head = new ListNode(-1);
+        ListNode tail = head;
+        PriorityQueue<ListNode> heap = new PriorityQueue<>(new Cmp());
+
+        for (ListNode l : lists) {
+            if (l != null) {
+                heap.add(l);
+            }
+        }
+
+        while (!heap.isEmpty()) {
+            ListNode t = heap.poll();
+            tail.next = t;
+            tail = t;
+            if (t.next != null) {
+                heap.add(t.next);
+            }
+        }
+
+        return head.next;
+    }
+}
+~~~
+
+
+
+~~~java
+// 两两合并的思路
+class Node{
+    int val;
+    Node next;
+    Node(){}
+    Node(int val) {this.val = val;}
+    Node(int val,Node next){ this,val = val; this.next = next;}
+}
+class Solution {
+    public ListNode mergeKLists(ListNode[] lists) {
+        ListNode ans = null;
+        for (int i = 0; i < lists.length; i++) {
+            ans = mergeTwoLists(ans, lists[i]);
+        }
+        return ans;
+    }
+
+    public ListNode mergeTwoLists(ListNode a, ListNode b) {
+        if (a == null || b == null) {
+            return a != null ? a : b;
+        }
+        ListNode head = new ListNode(0);
+        ListNode tail = head, pa = a, pb = b;
+        while (pa != null && pb != null) {
+            if (pa.val < pb.val) {
+                tail.next = pa;
+                pa = pa.next;
+            } else {
+                tail.next = pb;
+                pb = pb.next;
+            }
+            tail = tail.next;
+        }
+        if (pa != null) {
+            tail.next = pa;
+        } else {
+            tail.next = pb;
+        }
+        return head.next;
+    }
+}
+
+~~~
+
+### 146.LRU缓存
+
+请你设计并实现一个满足 LRU (最近最少使用) 缓存]约束的数据结构。
+
+实现 `LRUCache` 类：
+
+- `LRUCache(int capacity)` 以 **正整数** 作为容量 `capacity` 初始化 LRU 缓存
+- `int get(int key)` 如果关键字 `key` 存在于缓存中，则返回关键字的值，否则返回 `-1` 。
+- `void put(int key, int value)` 如果关键字 `key` 已经存在，则变更其数据值 `value` ；如果不存在，则向缓存中插入该组 `key-value` 。如果插入操作导致关键字数量超过 `capacity` ，则应该 **逐出** 最久未使用的关键字。
+
+函数 `get` 和 `put` 必须以 `O(1)` 的平均时间复杂度运行。
+
+~~~java
+// 函数 `get` 和 `put` 必须以 `O(1)`  那这个直接用hash表
+//逐出最久未使用得那就用双向链表 要删除表头和表尾元素
+
+class LRUCache {
+    class Node{
+        int key;
+        int val;
+        Node left,right;
+        Node(int key,int val){
+            this.key = key;
+            this.val = val;
+            this.left = null;
+            this.right = null;
+        } 
+    }
+    private Node L,R;
+    private int n;
+    private Map<Integer,Node> hash;
+    public LRUCache(int capacity) {
+        n = capacity;
+        L = new Node(-1,-1);
+        R = new Node(-1,-1);
+        L.right = R;
+        R.left = L;
+        hash = new HashMap<>();
+    }
+    public void insert(Node p){
+        //双向链表加入头结点
+        p.left = L;
+        p.right = L.right;
+        L.right = p;
+        p.right.left = p;
+        
+    }
+    public void remove(Node p){
+        //删除一个结点
+        p.left.right = p.right;
+        p.right.left = p.left;
+    }
+    public int get(int key) {
+        if(hash.containsKey(key)){        
+            Node newNode = hash.get(key);
+            remove(newNode);
+            insert(newNode);
+            return newNode.val;
+        }else{
+            return -1;
+        }
+    }
+    public void put(int key, int value) {
+        //放置一个新的值
+        if(hash.containsKey(key)){
+            Node newNode = hash.get(key);
+            remove(newNode);
+            insert(newNode);
+            newNode.val = value;
+        }else{
+            if(n == hash.size()){
+                //说明满了 得把最后一个删除
+                Node p = R.left;
+                remove(p);
+                hash.remove(p.key);//删除是以key
+            }
+            Node newNode = new Node(key,value);
+            hash.put(key,newNode);
+            insert(newNode);
+        }
+    }
+}
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache obj = new LRUCache(capacity);
+ * int param_1 = obj.get(key);
+ * obj.put(key,value);
+ */
+~~~
+
+##  树
+
+## 94.二叉树的中序遍历
+
+给定一个二叉树的根节点 `root` ，返回 *它的 **中序** 遍历* 。
+
+~~~java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    List<Integer> list  = new ArrayList<>();
+    public List<Integer> inorderTraversal(TreeNode root) {
+        if(root != null){
+            inorderTraversal(root.left);
+            list.add(root.val);
+            inorderTraversal(root.right);
+        }
+        return list;
+    }
+}
+~~~
+
+## 104.二叉树的最大深度
+
+给定一个二叉树 `root` ，返回其最大深度。
+
+二叉树的 **最大深度** 是指从根节点到最远叶子节点的最长路径上的节点数。
+
+~~~java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public int maxDepth(TreeNode root) {
+        //如果根节点为空，树的深度为0
+        if(root == null){
+            return 0;
+        }
+        //递归计算左子树和右子树的最大深度
+        int leftDepth = maxDepth(root.left);//左子树的最大深度
+        int rightDepth = maxDepth(root.right);//右子树的最大深度
+        //返回当前节点为根的树的最大深度(左子树深度和右子树深度的最大值＋1)
+        return Math.max(leftDepth,rightDepth)+1;
+    }
+}
+~~~
+
+## 226.翻转二叉树
+
+给你一棵二叉树的根节点 `root` ，翻转这棵二叉树，并返回其根节点。
+
+~~~java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public TreeNode invertTree(TreeNode root) {
+        //先翻转当前root的左右孩子
+        if(root == null) return null;
+        TreeNode tmp = root.left;
+        root.left = root.right;
+        root.right = tmp;
+        invertTree(root.left);
+        invertTree(root.right);
+        return root;
+    }
+}
+~~~
+
+## 101.对称二叉树
+
+给你一个二叉树的根节点 `root` ， 检查它是否轴对称。
+
+~~~java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public boolean isValid(TreeNode p,TreeNode q){
+        if(p == null && q == null) return true;
+        if(p == null || q == null || p.val != q.val) return false;
+        return isValid(p.left,q.right) && isValid(p.right,q.left);
+    }
+
+    public boolean isSymmetric(TreeNode root) {
+        if(root == null) return true;
+        return isValid(root.left,root.right);
+    }
+}
+~~~
+
+## 543.二叉树的直径
+
+~~~java
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode() {}
+ *     TreeNode(int val) { this.val = val; }
+ *     TreeNode(int val, TreeNode left, TreeNode right) {
+ *         this.val = val;
+ *         this.left = left;
+ *         this.right = right;
+ *     }
+ * }
+ */
+class Solution {
+    public int ans = 0;
+    public int diameterOfBinaryTree(TreeNode root) {
+        dfs(root);
+        return ans;
+    }
+    public int dfs(TreeNode root){
+        if(root == null) return 0;
+        int left = dfs(root.left);
+        int right = dfs(root.right);
+        ans = Math.max(left+right,ans);
+        return Math.max(left,right)+1;
+    }
+}
+~~~
+
+
+
+
+

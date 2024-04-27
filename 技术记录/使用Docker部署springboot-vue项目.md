@@ -108,7 +108,7 @@ docker run -p 3306:3306 --name mysql \
 -e MYSQL_ROOT_PASSWORD=root \
 -d mysql:5.7
 
-docker run -p 3308:3306 --name mysql #防止本地端口被本地mysql占用
+docker run -p 3315:3306 --name mysql \
 -e MYSQL_ROOT_PASSWORD=root 
 -d mysql:5.7
 
@@ -133,14 +133,15 @@ docker run -p 3308:3306 --name mysql3308 --restart=always \
 ### mysql修改密码
 
 ~~~shell
-set password for root@localhost = password('123456');
+set password for root@localhost = password('926424qq!!!');
 ~~~
 
 ### mysql首次使用必须设置访问权限
 
 ~~~shell
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'47.109.28.131' IDENTIFIED BY '你的密码' WITH GRANT OPTION;
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'62.234.62.75' IDENTIFIED BY '926424qq!' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'62.234.62.75' IDENTIFIED BY '926424qq!!!' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'124.89.8.8' IDENTIFIED BY '926424qq!!!' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 ~~~
 
