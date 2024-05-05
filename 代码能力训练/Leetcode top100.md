@@ -3217,19 +3217,111 @@ class Solution {
 }
 ~~~
 
-##  
+# 二分查找
 
+## 35.搜索插入位置
 
+给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。
 
+请必须使用时间复杂度为 `O(log n)` 的算法。
 
+~~~java
+//找出这个值或者比这个值大一点的数
+class Solution {
+    public int searchInsert(int[] nums, int target) {
+        int l = 0,r=nums.length-1;
+        while(l<r){
+            int mid = (l+r)/2;
+            if(nums[mid] >= target) r=mid;
+            else l=mid+1;
+        }
+        if(nums[l] < target) return l+1;
+        else return l;
+    }
+}
+~~~
 
+## 74.搜索二维矩阵
 
+给你一个满足下述两条属性的 `m x n` 整数矩阵：
 
+- 每行中的整数从左到右按非严格递增顺序排列。
+- 每行的第一个整数大于前一行的最后一个整数。
 
+给你一个整数 `target` ，如果 `target` 在矩阵中，返回 `true` ；否则，返回 `false` 。
 
+~~~java
+class Solution {
+    public boolean searchMatrix(int[][] matrix, int target) {
+        //查找到对应的行
+        int rowIndex = binarySearchFirstColumn(matrix,target);
+        if(rowIndex < 0){
+            return false;
+        }
+        //将对应的行输入进去去找具体的值
+        return binarySearchRow(matrix[rowIndex],target);
+    }
+    public boolean binarySearchRow(int[] row,int target){
+        int l=0,r=row.length-1;
+        while(l<r){
+            int mid = (l+r)/2;
+            if(row[mid] >= target) r=mid;
+            else l=mid+1;
+        }
+        if(row[l] != target) return false;
+        return true;
+    }
+    public int binarySearchFirstColumn(int[][] matrix,int target){
+        int l=0,r=matrix.length-1;
+        while(l < r){
+            int mid = (l+r)/2;
+            if(matrix[mid][0] >= target) r=mid;
+            else l=mid+1;
+        }
+        //找出这个值或者比这个值小一点的
+        if(matrix[l][0]>target) return l-1;
+        return l;//返回这个值
+    }
+}
+~~~
 
+## 34.在排序数组中查找元素的第一个和最后一个位置
 
+~~~java
+class Solution {
+    public int start(int[] nums,int target){
+        int l=0,r=nums.length-1;
+        while(l<r){
+            int mid = (l+r)/2;
+            //逼近最左边的值
+            if(nums[mid] >= target) r=mid;
+            else l=mid+1;
+        }
+        if(nums[l] == target) return l;
+        else return -1;
+    }
+    public int[] searchRange(int[] nums, int target) {
 
+        if(nums.length == 0) return new int[]{-1,-1};
+        //给出开始位置和结束位置
+        int st;
+        st=start(nums,target);
+        if(st == -1) return new int[]{-1,-1};
+        int end = st;
+        //找到起始位置后
+        while(end < nums.length && nums[end] == target ){
+            end++;
+        }
+        return new int[]{st,end-1};
+    }
+}
+~~~
+
+## 33.搜索旋转排序数组
+
+~~~java
+
+~~~
 
 
 
